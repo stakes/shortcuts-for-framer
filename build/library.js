@@ -22,7 +22,7 @@
 (function() {
   var Device;
 
-  Framer.Config.displayInDevice = {
+  Framer.Defaults.displayInDevice = {
     enabled: true,
     resizeToFit: true,
     containerView: typeof PSD !== "undefined" && PSD !== null ? PSD.Phone : void 0,
@@ -34,17 +34,17 @@
     bobbleImage: 'http://shortcuts-for-framer.s3.amazonaws.com/bobble.png'
   };
 
-  Framer.Config.defaultAnimation = {
+  Framer.Defaults.defaultAnimation = {
     curve: "spring(700,80,1000)",
     time: 500
   };
 
-  Framer.Config.fadeAnimation = {
+  Framer.Defaults.fadeAnimation = {
     curve: "ease-in-out",
     time: 200
   };
 
-  Framer.Config.slideAnimation = {
+  Framer.Defaults.slideAnimation = {
     curve: "ease-in-out",
     time: 200
   };
@@ -267,8 +267,8 @@
     thisView.animationTo = new Animation({
       view: thisView,
       properties: properties,
-      curve: Framer.Config.defaultAnimation.curve,
-      time: Framer.Config.defaultAnimation.time
+      curve: Framer.Defaults.defaultAnimation.curve,
+      time: Framer.Defaults.defaultAnimation.time
     });
     if ((time != null) && (curve == null)) {
       thisView.animationTo.curve = 'ease-in-out';
@@ -303,8 +303,8 @@
     * `myView.slideFromLeft()` will animate the view into the viewport **from** the left corner (from x=-width)
   
     Configuration:
-    * Framer.Config.slideAnimation.time
-    * Framer.Config.slideAnimation.curve
+    * Framer.Defaults.slideAnimation.time
+    * Framer.Defaults.slideAnimation.curve
   
   
     How to read the configuration:
@@ -318,17 +318,17 @@
 
   _.defer(function() {
     var _phone;
-    _phone = Framer.Config.displayInDevice.containerView;
+    _phone = Framer.Defaults.displayInDevice.containerView;
     if (_phone != null) {
       _phone.x = 0;
       _phone.y = 0;
-      _phone.width = Framer.Config.displayInDevice.canvasWidth;
-      _phone.height = Framer.Config.displayInDevice.canvasHeight;
+      _phone.width = Framer.Defaults.displayInDevice.canvasWidth;
+      _phone.height = Framer.Defaults.displayInDevice.canvasHeight;
       return _phone.clip = true;
     }
   });
 
-  Framer.Config.slideAnimations = {
+  Framer.Defaults.slideAnimations = {
     slideFromLeft: {
       property: "x",
       factor: "width",
@@ -375,12 +375,12 @@
     }
   };
 
-  _.each(Framer.Config.slideAnimations, function(opts, name) {
+  _.each(Framer.Defaults.slideAnimations, function(opts, name) {
     return View.prototype[name] = function() {
       var _animationConfig, _factor, _phone, _property;
-      _phone = Framer.Config.displayInDevice.containerView;
+      _phone = Framer.Defaults.displayInDevice.containerView;
       if (!_phone) {
-        console.log("Please wrap your project in a view named Phone, or set Framer.Config.displayInDevice.containerView to whatever your wrapper view is.");
+        console.log("Please wrap your project in a view named Phone, or set Framer.Defaults.displayInDevice.containerView to whatever your wrapper view is.");
         return;
       }
       _property = opts.property;
@@ -392,8 +392,8 @@
       _animationConfig[_property] = opts.to * _factor;
       return this.animate({
         properties: _animationConfig,
-        time: Framer.Config.slideAnimation.time,
-        curve: Framer.Config.slideAnimation.curve
+        time: Framer.Defaults.slideAnimation.time,
+        curve: Framer.Defaults.slideAnimation.curve
       });
     };
   });
@@ -406,7 +406,7 @@
   
     .fadeIn() and .fadeOut() are shortcuts to fade in a hidden view, or fade out a visible view.
   
-    To customize the fade animation, change the variables `Framer.Config.defaultFadeAnimation.time` and `defaultFadeAnimation.curve`.
+    To customize the fade animation, change the variables `Framer.Defaults.defaultFadeAnimation.time` and `defaultFadeAnimation.curve`.
    */
 
   Layer.prototype.show = function() {
@@ -420,7 +420,7 @@
 
   Layer.prototype.fadeIn = function(time) {
     if (time == null) {
-      time = Framer.Config.fadeAnimation.time;
+      time = Framer.Defaults.fadeAnimation.time;
     }
     if (this.opacity === 1 && this.visible) {
       return;
@@ -433,7 +433,7 @@
       properties: {
         opacity: 1
       },
-      curve: Framer.Config.fadeAnimation.curve,
+      curve: Framer.Defaults.fadeAnimation.curve,
       time: time
     });
   };
@@ -441,7 +441,7 @@
   Layer.prototype.fadeOut = function(time) {
     var that;
     if (time == null) {
-      time = Framer.Config.fadeAnimation.time;
+      time = Framer.Defaults.fadeAnimation.time;
     }
     if (this.opacity === 0 || !this.visible) {
       return;
@@ -451,7 +451,7 @@
       properties: {
         opacity: 0
       },
-      curve: Framer.Config.fadeAnimation.curve,
+      curve: Framer.Defaults.fadeAnimation.curve,
       time: time,
       callback: function() {
         return that.visible = false;
@@ -587,7 +587,7 @@
     };
 
     Device.prototype.enableCursor = function() {
-      return document.body.style.cursor = "url(" + Framer.Config.displayInDevice.bobbleImage + ") 32 32, default";
+      return document.body.style.cursor = "url(" + Framer.Defaults.displayInDevice.bobbleImage + ") 32 32, default";
     };
 
     Device.prototype.refresh = function() {
@@ -630,7 +630,7 @@
   Framer.Device = new Device;
 
   _.defer(function() {
-    return Framer.Device.build(Framer.Config.displayInDevice);
+    return Framer.Device.build(Framer.Defaults.displayInDevice);
   });
 
 
