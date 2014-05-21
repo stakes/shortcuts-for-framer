@@ -33,7 +33,7 @@ Include `library.js` right before `app.js` in your Framer `index.html` file.
 
 ## Others
 * `view.getChild('name')` and `view.getChildren('name')` retrieve the children of a view by name. Useful when traversing the layer hierarchy.
-* `Framer.utils.convertRange(OldMin, OldMax, OldValue, NewMin, NewMax, [capped])` converts a number `oldValue` from one range `(oldMin, oldMax)` to another `(newMin, newMax)`. If you'd like to cap the output to NewMin and NewMax, enable `capped`.
+* `Utils.convertRange(OldMin, OldMax, OldValue, NewMin, NewMax, [capped])` converts a number `oldValue` from one range `(oldMin, oldMax)` to another `(newMin, newMax)`. If you'd like to cap the output to NewMin and NewMax, enable `capped`.
 
 # Questions
 

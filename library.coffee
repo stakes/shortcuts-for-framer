@@ -19,7 +19,7 @@
   CONFIGURATION
 ###
 
-Framer.config.displayInDevice =
+Framer.Config.displayInDevice =
   enabled: true
   resizeToFit: true
   containerView: PSD?.Phone
@@ -30,15 +30,15 @@ Framer.config.displayInDevice =
   deviceImage: 'http://shortcuts-for-framer.s3.amazonaws.com/iphone-5s-white.png'
   bobbleImage: 'http://shortcuts-for-framer.s3.amazonaws.com/bobble.png'
 
-Framer.config.defaultAnimation =
+Framer.Config.defaultAnimation =
   curve: "spring(700,80,1000)"
   time: 500
 
-Framer.config.fadeAnimation =
+Framer.Config.fadeAnimation =
   curve: "ease-in-out"
   time: 200
 
-Framer.config.slideAnimation =
+Framer.Config.slideAnimation =
   curve: "ease-in-out"
   time: 200
 
@@ -50,11 +50,11 @@ Framer.config.slideAnimation =
   Shorthand for applying a function to every view in the document.
 
   Example:
-  ```Framer.utils.everyView(function(view) {
+  ```Utils.everyView(function(view) {
     view.visible = false;
   });```
 ###
-Framer.utils.everyView = (fn) ->
+Utils.everyView = (fn) ->
   for viewName of PSD
     _view = PSD[viewName]
     fn _view
@@ -73,7 +73,7 @@ Framer.utils.everyView = (fn) ->
   Notes:
   Javascript has some names reserved for internal function that you can't override (for ex. )
 ###
-Framer.utils.everyView (view) ->
+Utils.everyView (view) ->
   window[view.name] = view
 
 
@@ -133,7 +133,7 @@ View::getChildren = (needle) ->
   By default, this value might be outside the bounds of NewMin and NewMax if the OldValue is outside OldMin and OldMax. If you want to cap the final value to NewMin and NewMax, set capped to true.
   Make sure NewMin is smaller than NewMax if you're using this. If you need an inverse proportion, try swapping OldMin and OldMax.
 ###
-Framer.utils.convertRange = (OldMin, OldMax, OldValue, NewMin, NewMax, capped) ->
+Utils.convertRange = (OldMin, OldMax, OldValue, NewMin, NewMax, capped) ->
   OldRange = (OldMax - OldMin)
   NewRange = (NewMax - NewMin)
   NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
@@ -162,7 +162,7 @@ Framer.utils.convertRange = (OldMin, OldMax, OldValue, NewMin, NewMax, capped) -
   ```MyView.x = 200; // now we set it to 200.
   View.x = View.originalFrame.x // now we set it back to its original value, 400.```
 ###
-Framer.utils.everyView (view) ->
+Utils.everyView (view) ->
   view.originalFrame = view.frame
 
 ###
@@ -226,8 +226,8 @@ View::animateTo = (properties, first, second, third) ->
   thisView.animationTo = new Animation
     view: thisView
     properties: properties
-    curve: Framer.config.defaultAnimation.curve
-    time: Framer.config.defaultAnimation.time
+    curve: Framer.Config.defaultAnimation.curve
+    time: Framer.Config.defaultAnimation.time
 
   if time? && !curve?
     thisView.animationTo.curve = 'ease-in-out'
@@ -259,8 +259,8 @@ View::animateTo = (properties, first, second, third) ->
   * `myView.slideFromLeft()` will animate the view into the viewport **from** the left corner (from x=-width)
 
   Configuration:
-  * Framer.config.slideAnimation.time
-  * Framer.config.slideAnimation.curve
+  * Framer.Config.slideAnimation.time
+  * Framer.Config.slideAnimation.curve
 
 
   How to read the configuration:
@@ -275,16 +275,16 @@ View::animateTo = (properties, first, second, third) ->
 _.defer ->
   # Deferred, so if you change the config in your app.js, it's taken into account.
 
-  _phone = Framer.config.displayInDevice.containerView
+  _phone = Framer.Config.displayInDevice.containerView
   if _phone?
     _phone.x = 0
     _phone.y = 0
-    _phone.width = Framer.config.displayInDevice.canvasWidth
-    _phone.height = Framer.config.displayInDevice.canvasHeight
+    _phone.width = Framer.Config.displayInDevice.canvasWidth
+    _phone.height = Framer.Config.displayInDevice.canvasHeight
     _phone.clip = true
 
 
-Framer.config.slideAnimations =
+Framer.Config.slideAnimations =
   slideFromLeft:
     property: "x"
     factor: "width"
@@ -331,12 +331,12 @@ Framer.config.slideAnimations =
 
 
 
-_.each Framer.config.slideAnimations, (opts, name) ->
+_.each Framer.Config.slideAnimations, (opts, name) ->
   View.prototype[name] = ->
-    _phone = Framer.config.displayInDevice.containerView
+    _phone = Framer.Config.displayInDevice.containerView
 
     unless _phone
-      console.log "Please wrap your project in a view named Phone, or set Framer.config.displayInDevice.containerView to whatever your wrapper view is."
+      console.log "Please wrap your project in a view named Phone, or set Framer.Config.displayInDevice.containerView to whatever your wrapper view is."
       return
 
     _property = opts.property
@@ -352,8 +352,8 @@ _.each Framer.config.slideAnimations, (opts, name) ->
 
     this.animate
       properties: _animationConfig
-      time: Framer.config.slideAnimation.time
-      curve: Framer.config.slideAnimation.curve
+      time: Framer.Config.slideAnimation.time
+      curve: Framer.Config.slideAnimation.curve
 
 
 
@@ -364,7 +364,7 @@ _.each Framer.config.slideAnimations, (opts, name) ->
 
   .fadeIn() and .fadeOut() are shortcuts to fade in a hidden view, or fade out a visible view.
 
-  To customize the fade animation, change the variables `Framer.config.defaultFadeAnimation.time` and `defaultFadeAnimation.curve`.
+  To customize the fade animation, change the variables `Framer.Config.defaultFadeAnimation.time` and `defaultFadeAnimation.curve`.
 ###
 View::show = ->
   @visible = true
@@ -374,7 +374,7 @@ View::hide = ->
   @visible = false
 
 
-View::fadeIn = (time = Framer.config.fadeAnimation.time) ->
+View::fadeIn = (time = Framer.Config.fadeAnimation.time) ->
   return if @opacity == 1 and @visible
 
   unless @visible
@@ -384,18 +384,18 @@ View::fadeIn = (time = Framer.config.fadeAnimation.time) ->
   @animate
     properties:
       opacity: 1
-    curve: Framer.config.fadeAnimation.curve
+    curve: Framer.Config.fadeAnimation.curve
     time: time
 
 
-View::fadeOut = (time = Framer.config.fadeAnimation.time) ->
+View::fadeOut = (time = Framer.Config.fadeAnimation.time) ->
   return if @opacity == 0 or !@visible
 
   that = @
   @animate
     properties:
       opacity: 0
-    curve: Framer.config.fadeAnimation.curve
+    curve: Framer.Config.fadeAnimation.curve
     time: time
     callback: ->
       that.visible = false
@@ -412,7 +412,7 @@ View::fadeOut = (time = Framer.config.fadeAnimation.time) ->
   - Button_hover (hover)
 ###
 
-Framer.utils.everyView (view) ->
+Utils.everyView (view) ->
   _default = view.getChild('default')
 
   if view.name.toLowerCase().indexOf('touchable') and _default
@@ -516,7 +516,7 @@ class Device
       @resize()
 
   enableCursor: ->
-    document.body.style.cursor = "url(#{Framer.config.displayInDevice.bobbleImage}) 32 32, default"
+    document.body.style.cursor = "url(#{Framer.Config.displayInDevice.bobbleImage}) 32 32, default"
 
   refresh: ->
     if @enabled
@@ -556,7 +556,7 @@ class Device
 
 Framer.Device = new Device
 _.defer ->
-  Framer.Device.build Framer.config.displayInDevice
+  Framer.Device.build Framer.Config.displayInDevice
 
 
 
