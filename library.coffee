@@ -45,25 +45,26 @@ Framer.Config.slideAnimation =
 
 
 ###
-  LOOP ON EVERY VIEW
+  LOOP ON EVERY LAYER
 
-  Shorthand for applying a function to every view in the document.
+  Shorthand for applying a function to every layer in the document.
 
   Example:
-  ```Utils.everyView(function(view) {
+  ```Utils.everyLayer(function(view) {
     view.visible = false;
   });```
 ###
-Utils.everyView = (fn) ->
-  for viewName of PSD
-    _view = PSD[viewName]
+Utils.everyLayer = (fn) ->
+  layerList = Layer.Layers()
+  for viewName of layerList
+    _view = layerList[viewName]
     fn _view
 
 
 ###
-  SHORTHAND FOR ACCESSING VIEWS
+  SHORTHAND FOR ACCESSING LAYER
 
-  Convert each view coming from the exporter into a Javascript object for shorthand access.
+  Convert each layer into a Javascript object for shorthand access.
 
   If you have a layer in your PSD/Sketch called "NewsFeed", this will create a global Javascript variable called "NewsFeed" that you can manipulate with Framer.
 
@@ -73,12 +74,12 @@ Utils.everyView = (fn) ->
   Notes:
   Javascript has some names reserved for internal function that you can't override (for ex. )
 ###
-Utils.everyView (view) ->
+Utils.everyLayer (view) ->
   window[view.name] = view
 
 
 ###
-  FIND CHILD VIEWS BY NAME
+  FIND CHILD LAYERS BY NAME
 
   Retrieves subviews of selected view that have a matching name.
 
@@ -92,7 +93,7 @@ Utils.everyView (view) ->
 
   `childViews = Table.getChildren("Cell")` Returns all children whose name match Cell in an array.
 ###
-View::getChild = (needle) ->
+Layer::getChild = (needle) ->
   # Search direct children
   for k of @subViews
     subView = @subViews[k]
@@ -105,7 +106,7 @@ View::getChild = (needle) ->
     return found if found
 
 
-View::getChildren = (needle) ->
+Layer::getChildren = (needle) ->
   results = []
 
   for k of @subViews
@@ -162,7 +163,7 @@ Utils.convertRange = (OldMin, OldMax, OldValue, NewMin, NewMax, capped) ->
   ```MyView.x = 200; // now we set it to 200.
   View.x = View.originalFrame.x // now we set it back to its original value, 400.```
 ###
-Utils.everyView (view) ->
+Utils.everyLayer (view) ->
   view.originalFrame = view.frame
 
 ###
@@ -173,7 +174,7 @@ Utils.everyView (view) ->
   Example:
   `MyView.hover(function() { OtherView.show() }, function() { OtherView.hide() });`
 ###
-View::hover = (enterFunction, leaveFunction) ->
+Layer::hover = (enterFunction, leaveFunction) ->
   this.on 'mouseenter', enterFunction
   this.on 'mouseleave', leaveFunction
 
@@ -207,7 +208,7 @@ View::hover = (enterFunction, leaveFunction) ->
 
 
 
-View::animateTo = (properties, first, second, third) ->
+Layer::animateTo = (properties, first, second, third) ->
   thisView = this
   time = curve = callback = null
 
@@ -366,15 +367,15 @@ _.each Framer.Config.slideAnimations, (opts, name) ->
 
   To customize the fade animation, change the variables `Framer.Config.defaultFadeAnimation.time` and `defaultFadeAnimation.curve`.
 ###
-View::show = ->
+Layer::show = ->
   @visible = true
   @opacity = 1
 
-View::hide = ->
+Layer::hide = ->
   @visible = false
 
 
-View::fadeIn = (time = Framer.Config.fadeAnimation.time) ->
+Layer::fadeIn = (time = Framer.Config.fadeAnimation.time) ->
   return if @opacity == 1 and @visible
 
   unless @visible
@@ -388,7 +389,7 @@ View::fadeIn = (time = Framer.Config.fadeAnimation.time) ->
     time: time
 
 
-View::fadeOut = (time = Framer.Config.fadeAnimation.time) ->
+Layer::fadeOut = (time = Framer.Config.fadeAnimation.time) ->
   return if @opacity == 0 or !@visible
 
   that = @
@@ -412,7 +413,7 @@ View::fadeOut = (time = Framer.Config.fadeAnimation.time) ->
   - Button_hover (hover)
 ###
 
-Utils.everyView (view) ->
+Utils.everyLayer (view) ->
   _default = view.getChild('default')
 
   if view.name.toLowerCase().indexOf('touchable') and _default
@@ -566,5 +567,5 @@ _.defer ->
   Instead of `view.on(Events.TouchEnd, handler)`, use `view.tap(handler)`
 ###
 
-View::tap = (handler) ->
+Layer::tap = (handler) ->
   this.on Events.TouchEnd, handler

@@ -51,21 +51,22 @@
 
 
   /*
-    LOOP ON EVERY VIEW
+    LOOP ON EVERY LAYER
   
-    Shorthand for applying a function to every view in the document.
+    Shorthand for applying a function to every layer in the document.
   
     Example:
-    ```Utils.everyView(function(view) {
+    ```Utils.everyLayer(function(view) {
       view.visible = false;
     });```
    */
 
-  Utils.everyView = function(fn) {
-    var viewName, _results, _view;
+  Utils.everyLayer = function(fn) {
+    var layerList, viewName, _results, _view;
+    layerList = Layer.Layers();
     _results = [];
-    for (viewName in PSD) {
-      _view = PSD[viewName];
+    for (viewName in layerList) {
+      _view = layerList[viewName];
       _results.push(fn(_view));
     }
     return _results;
@@ -73,9 +74,9 @@
 
 
   /*
-    SHORTHAND FOR ACCESSING VIEWS
+    SHORTHAND FOR ACCESSING LAYER
   
-    Convert each view coming from the exporter into a Javascript object for shorthand access.
+    Convert each layer into a Javascript object for shorthand access.
   
     If you have a layer in your PSD/Sketch called "NewsFeed", this will create a global Javascript variable called "NewsFeed" that you can manipulate with Framer.
   
@@ -86,13 +87,13 @@
     Javascript has some names reserved for internal function that you can't override (for ex. )
    */
 
-  Utils.everyView(function(view) {
+  Utils.everyLayer(function(view) {
     return window[view.name] = view;
   });
 
 
   /*
-    FIND CHILD VIEWS BY NAME
+    FIND CHILD LAYERS BY NAME
   
     Retrieves subviews of selected view that have a matching name.
   
@@ -107,7 +108,7 @@
     `childViews = Table.getChildren("Cell")` Returns all children whose name match Cell in an array.
    */
 
-  View.prototype.getChild = function(needle) {
+  Layer.prototype.getChild = function(needle) {
     var found, k, subView;
     for (k in this.subViews) {
       subView = this.subViews[k];
@@ -124,7 +125,7 @@
     }
   };
 
-  View.prototype.getChildren = function(needle) {
+  Layer.prototype.getChildren = function(needle) {
     var k, results, subView;
     results = [];
     for (k in this.subViews) {
@@ -185,7 +186,7 @@
     View.x = View.originalFrame.x // now we set it back to its original value, 400.```
    */
 
-  Utils.everyView(function(view) {
+  Utils.everyLayer(function(view) {
     return view.originalFrame = view.frame;
   });
 
@@ -199,7 +200,7 @@
     `MyView.hover(function() { OtherView.show() }, function() { OtherView.hide() });`
    */
 
-  View.prototype.hover = function(enterFunction, leaveFunction) {
+  Layer.prototype.hover = function(enterFunction, leaveFunction) {
     this.on('mouseenter', enterFunction);
     return this.on('mouseleave', leaveFunction);
   };
@@ -233,7 +234,7 @@
     }, 1000)
    */
 
-  View.prototype.animateTo = function(properties, first, second, third) {
+  Layer.prototype.animateTo = function(properties, first, second, third) {
     var callback, curve, thisView, time;
     thisView = this;
     time = curve = callback = null;
@@ -399,16 +400,16 @@
     To customize the fade animation, change the variables `Framer.Config.defaultFadeAnimation.time` and `defaultFadeAnimation.curve`.
    */
 
-  View.prototype.show = function() {
+  Layer.prototype.show = function() {
     this.visible = true;
     return this.opacity = 1;
   };
 
-  View.prototype.hide = function() {
+  Layer.prototype.hide = function() {
     return this.visible = false;
   };
 
-  View.prototype.fadeIn = function(time) {
+  Layer.prototype.fadeIn = function(time) {
     if (time == null) {
       time = Framer.Config.fadeAnimation.time;
     }
@@ -428,7 +429,7 @@
     });
   };
 
-  View.prototype.fadeOut = function(time) {
+  Layer.prototype.fadeOut = function(time) {
     var that;
     if (time == null) {
       time = Framer.Config.fadeAnimation.time;
@@ -461,7 +462,7 @@
     - Button_hover (hover)
    */
 
-  Utils.everyView(function(view) {
+  Utils.everyLayer(function(view) {
     var hitTarget, _default, _down, _hover;
     _default = view.getChild('default');
     if (view.name.toLowerCase().indexOf('touchable') && _default) {
@@ -626,7 +627,7 @@
     Instead of `view.on(Events.TouchEnd, handler)`, use `view.tap(handler)`
    */
 
-  View.prototype.tap = function(handler) {
+  Layer.prototype.tap = function(handler) {
     return this.on(Events.TouchEnd, handler);
   };
 
