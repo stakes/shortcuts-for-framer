@@ -68,14 +68,17 @@ Utils.everyLayer = (fn) ->
 
   If you have a layer in your PSD/Sketch called "NewsFeed", this will create a global Javascript variable called "NewsFeed" that you can manipulate with Framer.
 
+  Deferred because Framer.Importer.load happens in app.js as of v3.
+
   Example:
   `NewsFeed.visible = false;`
 
   Notes:
   Javascript has some names reserved for internal function that you can't override (for ex. )
 ###
-Utils.everyLayer (view) ->
-  window[view.name] = view
+_.defer ->
+  Utils.everyLayer (view) ->
+    window[view.name] = view
 
 
 ###
@@ -157,14 +160,18 @@ Utils.convertRange = (OldMin, OldMax, OldValue, NewMin, NewMax, capped) ->
 
   Stores the initial location and size of a view in the "originalFrame" attribute, so you can revert to it later on.
 
+  Deferred because Framer.Importer.load happens in app.js as of v3.
+  
   Example:
   The x coordinate of MyView is initially 400 (from the PSD)
 
   ```MyView.x = 200; // now we set it to 200.
   View.x = View.originalFrame.x // now we set it back to its original value, 400.```
 ###
-Utils.everyLayer (view) ->
-  view.originalFrame = view.frame
+_.defer ->
+  Utils.everyLayer (view) ->
+    console.log view
+    view.originalFrame = view.frame
 
 ###
   SHORTHAND HOVER SYNTAX
@@ -407,57 +414,60 @@ Layer::fadeOut = (time = Framer.Config.fadeAnimation.time) ->
 
   By naming your view hierarchy in the following way, you can automatically have your views react to hovers, clicks or taps.
 
+  Deferred because Framer.Importer.load happens in app.js as of v3.
+
   Button_touchable
   - Button_default (default state)
   - Button_down (touch/click state)
   - Button_hover (hover)
 ###
 
-Utils.everyLayer (view) ->
-  _default = view.getChild('default')
+_.defer ->
+  Utils.everyLayer (view) ->
+    _default = view.getChild('default')
 
-  if view.name.toLowerCase().indexOf('touchable') and _default
+    if view.name.toLowerCase().indexOf('touchable') and _default
 
-    unless utils.isMobile()
-      _hover = view.getChild('hover')
-    _down = view.getChild('down')
+      unless utils.isMobile()
+        _hover = view.getChild('hover')
+      _down = view.getChild('down')
 
-    # These views should be hidden by default
-    _hover?.hide()
-    _down?.hide()
+      # These views should be hidden by default
+      _hover?.hide()
+      _down?.hide()
 
-    # Create fake hit target (so we don't re-fire events)
-    if _hover or _down
-      hitTarget = new View
-        frame: _default.frame
+      # Create fake hit target (so we don't re-fire events)
+      if _hover or _down
+        hitTarget = new View
+          frame: _default.frame
 
-      hitTarget.superView = view
-      hitTarget.bringToFront()
+        hitTarget.superView = view
+        hitTarget.bringToFront()
 
-    # There is a hover state, so define hover events (not for mobile)
-    if _hover
-      view.hover ->
-        _default.hide()
-        _hover.show()
-      , ->
-        _default.show()
-        _hover.hide()
-
-    # There is a down state, so define down events
-    if _down
-      view.on Events.TouchStart, ->
-        _default.hide()
-        _hover?.hide() # touch down state overrides hover state
-        _down.show()
-
-      view.on Events.TouchEnd, ->
-        _down.hide()
-
-        if _hover
-          # If there was a hover state, go back to the hover state
+      # There is a hover state, so define hover events (not for mobile)
+      if _hover
+        view.hover ->
+          _default.hide()
           _hover.show()
-        else
+        , ->
           _default.show()
+          _hover.hide()
+
+      # There is a down state, so define down events
+      if _down
+        view.on Events.TouchStart, ->
+          _default.hide()
+          _hover?.hide() # touch down state overrides hover state
+          _down.show()
+
+        view.on Events.TouchEnd, ->
+          _down.hide()
+
+          if _hover
+            # If there was a hover state, go back to the hover state
+            _hover.show()
+          else
+            _default.show()
 
 
 

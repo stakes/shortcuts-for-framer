@@ -80,6 +80,8 @@
   
     If you have a layer in your PSD/Sketch called "NewsFeed", this will create a global Javascript variable called "NewsFeed" that you can manipulate with Framer.
   
+    Deferred because Framer.Importer.load happens in app.js as of v3.
+  
     Example:
     `NewsFeed.visible = false;`
   
@@ -87,8 +89,10 @@
     Javascript has some names reserved for internal function that you can't override (for ex. )
    */
 
-  Utils.everyLayer(function(view) {
-    return window[view.name] = view;
+  _.defer(function() {
+    return Utils.everyLayer(function(view) {
+      return window[view.name] = view;
+    });
   });
 
 
@@ -179,6 +183,8 @@
   
     Stores the initial location and size of a view in the "originalFrame" attribute, so you can revert to it later on.
   
+    Deferred because Framer.Importer.load happens in app.js as of v3.
+    
     Example:
     The x coordinate of MyView is initially 400 (from the PSD)
   
@@ -186,8 +192,11 @@
     View.x = View.originalFrame.x // now we set it back to its original value, 400.```
    */
 
-  Utils.everyLayer(function(view) {
-    return view.originalFrame = view.frame;
+  _.defer(function() {
+    return Utils.everyLayer(function(view) {
+      console.log(view);
+      return view.originalFrame = view.frame;
+    });
   });
 
 
@@ -456,60 +465,64 @@
   
     By naming your view hierarchy in the following way, you can automatically have your views react to hovers, clicks or taps.
   
+    Deferred because Framer.Importer.load happens in app.js as of v3.
+  
     Button_touchable
     - Button_default (default state)
     - Button_down (touch/click state)
     - Button_hover (hover)
    */
 
-  Utils.everyLayer(function(view) {
-    var hitTarget, _default, _down, _hover;
-    _default = view.getChild('default');
-    if (view.name.toLowerCase().indexOf('touchable') && _default) {
-      if (!utils.isMobile()) {
-        _hover = view.getChild('hover');
-      }
-      _down = view.getChild('down');
-      if (_hover != null) {
-        _hover.hide();
-      }
-      if (_down != null) {
-        _down.hide();
-      }
-      if (_hover || _down) {
-        hitTarget = new View({
-          frame: _default.frame
-        });
-        hitTarget.superView = view;
-        hitTarget.bringToFront();
-      }
-      if (_hover) {
-        view.hover(function() {
-          _default.hide();
-          return _hover.show();
-        }, function() {
-          _default.show();
-          return _hover.hide();
-        });
-      }
-      if (_down) {
-        view.on(Events.TouchStart, function() {
-          _default.hide();
-          if (_hover != null) {
-            _hover.hide();
-          }
-          return _down.show();
-        });
-        return view.on(Events.TouchEnd, function() {
+  _.defer(function() {
+    return Utils.everyLayer(function(view) {
+      var hitTarget, _default, _down, _hover;
+      _default = view.getChild('default');
+      if (view.name.toLowerCase().indexOf('touchable') && _default) {
+        if (!utils.isMobile()) {
+          _hover = view.getChild('hover');
+        }
+        _down = view.getChild('down');
+        if (_hover != null) {
+          _hover.hide();
+        }
+        if (_down != null) {
           _down.hide();
-          if (_hover) {
+        }
+        if (_hover || _down) {
+          hitTarget = new View({
+            frame: _default.frame
+          });
+          hitTarget.superView = view;
+          hitTarget.bringToFront();
+        }
+        if (_hover) {
+          view.hover(function() {
+            _default.hide();
             return _hover.show();
-          } else {
-            return _default.show();
-          }
-        });
+          }, function() {
+            _default.show();
+            return _hover.hide();
+          });
+        }
+        if (_down) {
+          view.on(Events.TouchStart, function() {
+            _default.hide();
+            if (_hover != null) {
+              _hover.hide();
+            }
+            return _down.show();
+          });
+          return view.on(Events.TouchEnd, function() {
+            _down.hide();
+            if (_hover) {
+              return _hover.show();
+            } else {
+              return _default.show();
+            }
+          });
+        }
       }
-    }
+    });
   });
 
 
